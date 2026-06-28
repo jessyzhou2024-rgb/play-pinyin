@@ -28,9 +28,7 @@ Open `index.html` in a browser.
 
 ## GitHub Pages
 
-Upload the files to your GitHub repository root.
-
-The game page should open at:
+The game page open at:
 
 ```text
 https://jessyzhou2024-rgb.github.io/play-pinyin/
