@@ -1,0 +1,11 @@
+{
+  "name": "Pinyin Play Town",
+  "short_name": "Pinyin Town",
+  "description": "A playful Chinese pinyin learning game for children.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fffaf1",
+  "theme_color": "#ffd45f",
+  "icons": []
+}
+

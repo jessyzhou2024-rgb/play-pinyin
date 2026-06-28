@@ -1,0 +1,72 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Play Pinyin Logo</title>
+  <desc id="desc">A cheerful child-friendly Play Pinyin logo with colorful bubble letters, a music note, and a smiling pinyin town mascot.</desc>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#263149" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFE987"/>
+      <stop offset="1" stop-color="#FFB85F"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#BDE9FF"/>
+      <stop offset="1" stop-color="#74C7FF"/>
+    </linearGradient>
+    <linearGradient id="berry" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB7C4"/>
+      <stop offset="1" stop-color="#FF7F99"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D8F8EA"/>
+      <stop offset="1" stop-color="#8FE0BE"/>
+    </linearGradient>
+    <linearGradient id="lavender" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DED2FF"/>
+      <stop offset="1" stop-color="#B49CFF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" rx="52" fill="#FFFAF1"/>
+  <circle cx="150" cy="58" r="42" fill="#FFD45F" opacity="0.55"/>
+  <circle cx="1012" cy="82" r="56" fill="#8FD3FF" opacity="0.48"/>
+  <circle cx="1092" cy="266" r="38" fill="#CDBAFF" opacity="0.5"/>
+  <circle cx="88" cy="263" r="48" fill="#B9EAD7" opacity="0.52"/>
+
+  <g filter="url(#softShadow)">
+    <path d="M129 249C111 249 96 234 96 216V116C96 98 111 83 129 83H229C247 83 262 98 262 116V216C262 234 247 249 229 249H129Z" fill="url(#sky)" stroke="#263149" stroke-opacity="0.12" stroke-width="6"/>
+    <path d="M91 128L179 54L267 128H236V168H122V128H91Z" fill="url(#berry)" stroke="#263149" stroke-opacity="0.12" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="156" y="174" width="48" height="75" rx="24" fill="#FFF4D8"/>
+    <circle cx="148" cy="132" r="11" fill="#263149"/>
+    <circle cx="210" cy="132" r="11" fill="#263149"/>
+    <path d="M157 154C168 168 191 168 202 154" stroke="#263149" stroke-width="9" stroke-linecap="round"/>
+    <path d="M222 66C245 53 269 66 269 90C269 117 236 119 222 145C208 119 175 117 175 90C175 66 199 53 222 66Z" fill="url(#sun)"/>
+    <path d="M64 214C88 194 118 195 138 217C117 237 86 237 64 214Z" fill="url(#mint)"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <text x="316" y="169" font-family="Arial Rounded MT Bold, Avenir Next, Nunito, system-ui, sans-serif" font-size="105" font-weight="900" letter-spacing="0" fill="#263149">Play</text>
+    <text x="320" y="271" font-family="Arial Rounded MT Bold, Avenir Next, Nunito, system-ui, sans-serif" font-size="108" font-weight="900" letter-spacing="0" fill="#263149">Pinyin</text>
+  </g>
+
+  <g>
+    <circle cx="595" cy="132" r="16" fill="url(#sun)"/>
+    <circle cx="636" cy="127" r="13" fill="url(#mint)"/>
+    <circle cx="681" cy="134" r="18" fill="url(#lavender)"/>
+    <circle cx="865" cy="258" r="15" fill="url(#berry)"/>
+    <circle cx="912" cy="262" r="12" fill="url(#sky)"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <path d="M1008 95V211" stroke="#263149" stroke-width="18" stroke-linecap="round"/>
+    <path d="M1008 95C1034 123 1072 121 1096 98V147C1070 170 1031 168 1008 141V95Z" fill="url(#lavender)" stroke="#263149" stroke-width="12" stroke-linejoin="round"/>
+    <ellipse cx="978" cy="220" rx="38" ry="28" transform="rotate(-18 978 220)" fill="url(#sun)" stroke="#263149" stroke-width="10"/>
+  </g>
+
+  <g>
+    <path d="M333 303C494 328 692 326 889 303" stroke="#3F9A75" stroke-width="13" stroke-linecap="round" opacity="0.34"/>
+    <path d="M333 305C368 286 406 286 440 305" stroke="#FF8FA3" stroke-width="8" stroke-linecap="round"/>
+    <path d="M487 306C522 287 560 287 594 306" stroke="#FFD45F" stroke-width="8" stroke-linecap="round"/>
+    <path d="M642 306C677 287 715 287 749 306" stroke="#8FD3FF" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

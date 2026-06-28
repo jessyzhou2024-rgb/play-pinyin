@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffd45f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pinyin Town">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Pinyin Play Town</title>
+  <style>
+    :root {
+      --ink: #263149;
+      --soft-ink: rgba(38, 49, 73, 0.72);
+      --paper: #fffaf1;
+      --cream: #fff4d8;
+      --sun: #ffd45f;
+      --sky: #8fd3ff;
+      --mint: #b9ead7;
+      --berry: #ff8fa3;
+      --lavender: #cdbaff;
+      --leaf: #3f9a75;
+      --line: rgba(38, 49, 73, 0.14);
+      --shadow: 0 18px 42px rgba(70, 59, 44, 0.16);
+      --chunky-shadow: 0 7px 0 rgba(38, 49, 73, 0.12), 0 18px 34px rgba(70, 59, 44, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink);
+      font-family: ui-rounded, "Avenir Next", "Nunito", "Arial Rounded MT Bold", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(255, 212, 95, 0.58), transparent 22rem),
+        radial-gradient(circle at 88% 14%, rgba(143, 211, 255, 0.58), transparent 24rem),
+        radial-gradient(circle at 55% 38%, rgba(205, 186, 255, 0.22), transparent 22rem),
+        linear-gradient(180deg, #f8fcff 0%, #fff7e4 50%, #e3f6e9 100%);
+      overflow-x: hidden;
+    }
+
+    body[data-place="1"] {
+      background:
+        radial-gradient(circle at 18% 20%, rgba(255, 143, 163, 0.34), transparent 21rem),
+        radial-gradient(circle at 84% 14%, rgba(185, 234, 215, 0.62), transparent 23rem),
+        radial-gradient(circle at 48% 42%, rgba(255, 212, 95, 0.25), transparent 22rem),
+        linear-gradient(180deg, #fff9fb 0%, #fff4d8 50%, #dff7ec 100%);
+    }
+
+    body[data-place="2"] {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(205, 186, 255, 0.42), transparent 22rem),
+        radial-gradient(circle at 82% 16%, rgba(255, 212, 95, 0.5), transparent 23rem),
+        radial-gradient(circle at 58% 46%, rgba(143, 211, 255, 0.34), transparent 21rem),
+        linear-gradient(180deg, #fbf8ff 0%, #fff8e8 48%, #e7f3ff 100%);
+    }
+
+    body[data-place="3"] {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(143, 211, 255, 0.54), transparent 23rem),
+        radial-gradient(circle at 88% 18%, rgba(255, 189, 111, 0.48), transparent 22rem),
+        radial-gradient(circle at 54% 42%, rgba(255, 143, 163, 0.24), transparent 20rem),
+        linear-gradient(180deg, #f6fcff 0%, #fff2df 50%, #e4f7ea 100%);
+    }
+
+    button,
+    select {
+      font: inherit;
+      color: inherit;
+    }
+
+    .game {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+      padding: clamp(14px, 2.3vw, 28px);
+      position: relative;
+      isolation: isolate;
+    }
+
+    .sky-bubble {
+      position: fixed;
+      width: var(--size);
+      height: var(--size);
+      left: var(--left);
+      top: var(--top);
+      border-radius: 50%;
+      background: var(--color);
+      opacity: 0.32;
+      z-index: -2;
+      animation: drift var(--speed) ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      to {
+        transform: translateY(18px) translateX(8px);
+      }
+    }
+
+    .scene {
+      position: fixed;
+      inset: auto 0 0;
+      height: min(36vh, 285px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .cloud {
+      position: absolute;
+      top: 10px;
+      width: 94px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        22px -13px 0 2px rgba(255, 255, 255, 0.92),
+        48px -8px 0 5px rgba(255, 255, 255, 0.92);
+      animation: cloudFloat 7s ease-in-out infinite alternate;
+    }
+
+    .cloud.one { left: 9%; }
+    .cloud.two { right: 18%; top: 42px; transform: scale(0.78); animation-delay: -2s; }
+
+    @keyframes cloudFloat {
+      to { translate: 24px 0; }
+    }
+
+    .toy-house {
+      position: absolute;
+      bottom: 54px;
+      width: 86px;
+      height: 82px;
+      border-radius: 8px 8px 14px 14px;
+      background: #8fd3ff;
+      border: 4px solid rgba(38, 49, 73, 0.12);
+      box-shadow: 0 8px 0 rgba(38, 49, 73, 0.08);
+    }
+
+    .toy-house::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      top: -36px;
+      width: 102px;
+      height: 58px;
+      border-radius: 18px 18px 8px 8px;
+      background: #ff8fa3;
+      transform: rotate(-3deg);
+      clip-path: polygon(50% 0, 100% 62%, 88% 100%, 12% 100%, 0 62%);
+    }
+
+    .toy-house::after {
+      content: "";
+      position: absolute;
+      left: 30px;
+      bottom: 0;
+      width: 26px;
+      height: 40px;
+      border-radius: 12px 12px 0 0;
+      background: #fff4d8;
+      box-shadow: -20px -24px 0 -5px #fff4d8, 20px -24px 0 -5px #fff4d8;
+    }
+
+    .toy-house.left { left: 18%; }
+    .toy-house.right { right: 10%; bottom: 42px; transform: scale(0.82); background: #cdbaff; }
+
+    .hill {
+      position: absolute;
+      bottom: -92px;
+      width: 62vw;
+      height: 225px;
+      border-radius: 50% 50% 0 0;
+      background: #a7df8a;
+    }
+
+    .hill.one {
+      left: -12vw;
+    }
+
+    .hill.two {
+      right: -15vw;
+      width: 72vw;
+      background: #91dba7;
+    }
+
+    .flower {
+      position: absolute;
+      bottom: 28px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--berry);
+      box-shadow:
+        18px 0 #ffbd6f,
+        9px -14px #f67bb0,
+        9px 14px #ffd45f,
+        9px 0 0 7px #fff6c9;
+      animation: sway 2.7s ease-in-out infinite alternate;
+    }
+
+    .flower::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 31px;
+      width: 5px;
+      height: 72px;
+      border-radius: 999px;
+      background: var(--leaf);
+    }
+
+    .flower.a { left: 8%; }
+    .flower.b { left: 80%; animation-delay: -0.7s; transform: scale(0.86); }
+    .flower.c { left: 48%; animation-delay: -1.1s; transform: scale(0.72); }
+
+    @keyframes sway {
+      from { rotate: -3deg; }
+      to { rotate: 5deg; }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: min(100%, 290px);
+    }
+
+    .mascot {
+      width: clamp(76px, 9vw, 104px);
+      height: clamp(76px, 9vw, 104px);
+      border-radius: 45% 45% 50% 50%;
+      background:
+        radial-gradient(circle at 35% 39%, #253047 0 6px, transparent 7px),
+        radial-gradient(circle at 65% 39%, #253047 0 6px, transparent 7px),
+        radial-gradient(ellipse at 50% 63%, #ff7b73 0 13px, transparent 14px),
+        #ffd45f;
+      box-shadow: inset 0 -12px rgba(255, 157, 50, 0.22), var(--shadow);
+      position: relative;
+      flex: 0 0 auto;
+      animation: hello 2.8s ease-in-out infinite;
+    }
+
+    .mascot::before,
+    .mascot::after {
+      content: "";
+      position: absolute;
+      top: 7px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ffd45f;
+      border: 6px solid #fff1b3;
+    }
+
+    .mascot::before { left: -8px; }
+    .mascot::after { right: -8px; }
+
+    .mascot.party {
+      animation: partyBounce 0.54s ease;
+    }
+
+    @keyframes partyBounce {
+      35% { transform: translateY(-16px) rotate(-5deg) scale(1.06); }
+      70% { transform: translateY(2px) rotate(4deg) scale(0.98); }
+    }
+
+    @keyframes hello {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3.2vw, 2.85rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      max-width: 40rem;
+      color: var(--soft-ink);
+      font-weight: 800;
+      font-size: clamp(0.95rem, 1.6vw, 1.12rem);
+    }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill,
+    .icon-button,
+    .parent-tools {
+      border: 2px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 0 rgba(38, 49, 73, 0.09), 0 10px 22px rgba(70, 59, 44, 0.09);
+      backdrop-filter: blur(10px);
+    }
+
+    .pill {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 1.35rem;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .icon-button.music-on {
+      background: #dff7ec;
+      border-color: rgba(63, 154, 117, 0.42);
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.86fr) minmax(320px, 1.4fr);
+      gap: clamp(16px, 3vw, 28px);
+      align-items: stretch;
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .play-strip {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.72fr) minmax(280px, 1.28fr);
+      gap: clamp(12px, 2vw, 18px);
+      align-items: stretch;
+    }
+
+    .buddy-card,
+    .sticker-card {
+      border: 2px solid rgba(38, 49, 73, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 0 rgba(38, 49, 73, 0.08), 0 12px 24px rgba(70, 59, 44, 0.1);
+      padding: 12px;
+    }
+
+    .buddy-card {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .buddy {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: #fff3cf;
+      border: 2px solid rgba(38, 49, 73, 0.11);
+      font-size: 2rem;
+      box-shadow: inset 0 -7px rgba(38, 49, 73, 0.08);
+      animation: buddyWiggle 2.6s ease-in-out infinite;
+    }
+
+    .buddy.pop {
+      animation: buddyPop 0.48s ease;
+    }
+
+    @keyframes buddyWiggle {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(3deg) translateY(-3px); }
+    }
+
+    @keyframes buddyPop {
+      50% { transform: scale(1.18) rotate(-7deg); }
+    }
+
+    .buddy-text {
+      display: grid;
+      gap: 3px;
+      font-weight: 1000;
+    }
+
+    .buddy-text span {
+      color: var(--soft-ink);
+      font-size: 0.92rem;
+      font-weight: 900;
+    }
+
+    .sticker-card {
+      display: grid;
+      gap: 8px;
+    }
+
+    .sticker-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 1000;
+    }
+
+    .sticker-top span {
+      color: var(--soft-ink);
+      font-size: 0.92rem;
+    }
+
+    .sticker-track {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(34px, 1fr));
+      gap: 7px;
+    }
+
+    .sticker-slot {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: rgba(255, 244, 216, 0.75);
+      border: 2px dashed rgba(38, 49, 73, 0.16);
+      font-size: 1.35rem;
+    }
+
+    .sticker-slot.filled {
+      border-style: solid;
+      background: #fff;
+      animation: stickerPop 0.42s ease;
+    }
+
+    @keyframes stickerPop {
+      from { transform: scale(0.68) rotate(-8deg); opacity: 0; }
+    }
+
+    .panel {
+      border: 2px solid rgba(38, 49, 73, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: var(--chunky-shadow);
+    }
+
+    .prompt {
+      min-height: 100%;
+      padding: clamp(18px, 3vw, 28px);
+      display: grid;
+      align-content: center;
+      gap: 16px;
+    }
+
+    .garden-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+    }
+
+    .garden-title strong {
+      font-size: clamp(1.12rem, 2vw, 1.45rem);
+    }
+
+    .garden-title span {
+      color: var(--soft-ink);
+      font-weight: 900;
+    }
+
+    .listen {
+      display: grid;
+      place-items: center;
+      width: min(70vw, 280px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at 50% 42%, #ffffff 0 17%, transparent 18%),
+        radial-gradient(circle at 50% 50%, #ffe788 0 51%, #ffbd5f 52% 100%);
+      color: var(--ink);
+      box-shadow: inset 0 -16px rgba(194, 116, 20, 0.17), 0 22px 38px rgba(255, 139, 63, 0.21);
+      transition: transform 0.16s ease;
+      animation: soundPulse 2.6s ease-in-out infinite;
+    }
+
+    @keyframes soundPulse {
+      0%, 100% { box-shadow: inset 0 -16px rgba(194, 116, 20, 0.17), 0 22px 38px rgba(255, 139, 63, 0.21); }
+      50% { box-shadow: inset 0 -16px rgba(194, 116, 20, 0.17), 0 0 0 12px rgba(255, 212, 95, 0.18), 0 22px 38px rgba(255, 139, 63, 0.21); }
+    }
+
+    .listen:hover,
+    .icon-button:hover,
+    .choice:hover,
+    .next-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .listen:active,
+    .choice:active,
+    .next-button:active {
+      transform: scale(0.97);
+    }
+
+    .speaker {
+      font-size: clamp(4rem, 12vw, 7.6rem);
+      line-height: 1;
+    }
+
+    .target {
+      text-align: center;
+      min-height: 4.2em;
+    }
+
+    .target strong {
+      display: block;
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+    }
+
+    .target span {
+      color: var(--soft-ink);
+      font-weight: 900;
+    }
+
+    .parent-tools {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .parent-tools label {
+      display: grid;
+      gap: 6px;
+      color: var(--soft-ink);
+      font-size: 0.88rem;
+      font-weight: 900;
+    }
+
+    select {
+      width: 100%;
+      min-height: 46px;
+      border: 2px solid rgba(38, 49, 73, 0.16);
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tool-row button,
+    .next-button {
+      min-height: 46px;
+      border: 2px solid rgba(38, 49, 73, 0.14);
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 1000;
+      cursor: pointer;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+
+    .tool-row button:first-child {
+      background: #e5f6ff;
+    }
+
+    .tool-row button:nth-child(2) {
+      background: #dff7ec;
+    }
+
+    .tool-row button:last-child {
+      background: #fff3cf;
+    }
+
+    .choices-wrap {
+      position: relative;
+      min-height: 100%;
+      overflow: hidden;
+    }
+
+    .choices {
+      min-height: 100%;
+      padding: clamp(16px, 3vw, 28px);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(126px, 1fr));
+      gap: clamp(12px, 2vw, 18px);
+      align-content: center;
+    }
+
+    .choices.four {
+      grid-template-columns: repeat(2, minmax(126px, 1fr));
+    }
+
+    .choice {
+      min-height: clamp(112px, 17vw, 156px);
+      border: 3px solid rgba(38, 49, 73, 0.12);
+      border-radius: 8px;
+      background: var(--bubble, #fff);
+      cursor: pointer;
+      font-weight: 1000;
+      font-size: clamp(2.7rem, 7vw, 4.8rem);
+      box-shadow: inset 0 -10px rgba(38, 49, 73, 0.08), 0 12px 24px rgba(70, 59, 44, 0.11);
+      transition: transform 0.16s ease, filter 0.16s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choice:nth-child(odd) {
+      rotate: -1.2deg;
+    }
+
+    .choice:nth-child(even) {
+      rotate: 1.2deg;
+    }
+
+    .choice.long {
+      font-size: clamp(2.05rem, 5.7vw, 3.8rem);
+    }
+
+    .choice::after {
+      content: "";
+      position: absolute;
+      inset: 12% auto auto 15%;
+      width: 28%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    .choice.correct {
+      animation: pop 0.54s ease;
+      filter: saturate(1.28);
+    }
+
+    .choice.wrong {
+      animation: wiggle 0.38s ease;
+    }
+
+    @keyframes pop {
+      50% { transform: scale(1.1) rotate(-2deg); }
+    }
+
+    @keyframes wiggle {
+      20% { transform: translateX(-8px); }
+      45% { transform: translateX(8px); }
+      70% { transform: translateX(-5px); }
+    }
+
+    .completion {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      background: rgba(255, 250, 241, 0.94);
+    }
+
+    .completion.show {
+      display: grid;
+    }
+
+    .completion-box {
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+    }
+
+    .completion-box strong {
+      font-size: clamp(1.55rem, 4vw, 2.4rem);
+      line-height: 1.05;
+    }
+
+    .completion-box span {
+      color: var(--soft-ink);
+      font-weight: 900;
+      max-width: 26rem;
+    }
+
+    .next-button {
+      padding: 0 18px;
+      background: #dff7ec;
+    }
+
+    .toast {
+      min-height: 58px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 10px 18px;
+      font-size: clamp(1.02rem, 2vw, 1.28rem);
+      font-weight: 1000;
+    }
+
+    .garden {
+      min-height: 86px;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 2px 16px 10px;
+    }
+
+    .badge {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(38, 49, 73, 0.12);
+      box-shadow: 0 8px 16px rgba(70, 59, 44, 0.12);
+      font-size: 1.55rem;
+      animation: grow 0.42s ease both;
+    }
+
+    @keyframes grow {
+      from { transform: translateY(10px) scale(0.55); opacity: 0; }
+    }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .confetti i {
+      position: absolute;
+      top: -18px;
+      width: 12px;
+      height: 18px;
+      border-radius: 3px;
+      background: var(--c);
+      left: var(--x);
+      animation: fall 980ms linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(540deg);
+        opacity: 0.2;
+      }
+    }
+
+    footer {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: rgba(38, 49, 73, 0.62);
+      font-weight: 900;
+      text-align: center;
+      font-size: 0.94rem;
+    }
+
+    footer a {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.78);
+      border: 2px solid rgba(38, 49, 73, 0.12);
+      border-radius: 999px;
+      padding: 7px 12px;
+      text-decoration: none;
+      box-shadow: 0 5px 0 rgba(38, 49, 73, 0.08);
+    }
+
+    @media (max-width: 840px) {
+      .play-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 840px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .listen {
+        width: min(56vw, 230px);
+      }
+    }
+
+    @media (max-width: 540px) {
+      header {
+        align-items: stretch;
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .pill {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding-inline: 10px;
+      }
+
+      .choices,
+      .choices.four {
+        grid-template-columns: 1fr;
+      }
+
+      .choice {
+        min-height: 94px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="sky-bubble" style="--size: 90px; --left: 7%; --top: 18%; --color: #8fd3ff; --speed: 4.8s;"></div>
+    <div class="sky-bubble" style="--size: 70px; --left: 82%; --top: 21%; --color: #ff8fa3; --speed: 5.3s;"></div>
+    <div class="sky-bubble" style="--size: 56px; --left: 67%; --top: 62%; --color: #cdbaff; --speed: 4.4s;"></div>
+
+    <header>
+      <div class="brand">
+        <div class="mascot" aria-hidden="true"></div>
+        <div>
+          <h1>Pinyin Play Town</h1>
+          <p class="subtitle">Pop sounds, collect stickers, and grow a tiny pinyin world.</p>
+        </div>
+      </div>
+      <div class="stats" aria-live="polite">
+        <div class="pill">Flowers <span id="flowers">0</span></div>
+        <div class="pill">Step <span id="step">1</span>/6</div>
+        <button class="icon-button" id="music" type="button" aria-label="Turn playful music on" title="Music">♫</button>
+        <button class="icon-button" id="replayTop" type="button" aria-label="Hear the sound again" title="Hear again">♪</button>
+      </div>
+    </header>
+
+    <section class="play-strip" aria-label="Play progress">
+      <div class="buddy-card">
+        <div class="buddy" id="buddy" aria-hidden="true">🌟</div>
+        <div class="buddy-text">
+          <strong id="buddyLine">Star buddy is listening.</strong>
+          <span id="streakLine">Warm up with one happy sound.</span>
+        </div>
+      </div>
+      <div class="sticker-card">
+        <div class="sticker-top">
+          <strong>Sticker Book</strong>
+          <span id="stickerCount">0/6 today</span>
+        </div>
+        <div class="sticker-track" id="stickerTrack" aria-label="Round stickers"></div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="panel prompt" aria-label="Sound prompt">
+        <div class="garden-title">
+          <strong id="groupTitle">Sunny Finals</strong>
+          <span id="unlockText">Garden 1</span>
+        </div>
+        <button class="listen" id="listen" type="button" aria-label="Hear the pinyin sound">
+          <span class="speaker">♪</span>
+        </button>
+        <div class="target">
+          <strong id="task">Tap the music button</strong>
+          <span id="hint">Then pop the matching pinyin bubble.</span>
+        </div>
+
+        <div class="parent-tools" aria-label="Parent helper">
+          <label>
+            Parent helper
+            <select id="groupSelect" aria-label="Choose pinyin garden"></select>
+          </label>
+          <div class="tool-row">
+            <button id="replay" type="button">Hear Again</button>
+            <button id="musicTool" type="button">K-pop Beat</button>
+            <button id="reset" type="button">Start Over</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel choices-wrap" aria-label="Pinyin choices">
+        <div class="choices" id="choices"></div>
+        <div class="completion" id="completion" aria-live="polite">
+          <div class="completion-box">
+            <strong>Garden complete!</strong>
+            <span id="completionText">A new sound garden is ready.</span>
+            <button class="next-button" id="nextGarden" type="button">Next Garden</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="toast" id="toast" aria-live="polite">Ready for a pinyin pop?</section>
+    <section class="garden" id="garden" aria-label="Earned flower rewards"></section>
+
+    <footer>
+      <span>Short, happy rounds help the sound stick.</span>
+      <a href="docs.html">Game documentation</a>
+    </footer>
+    <div class="scene" aria-hidden="true">
+      <div class="cloud one"></div>
+      <div class="cloud two"></div>
+      <div class="hill one"></div>
+      <div class="hill two"></div>
+      <div class="toy-house left"></div>
+      <div class="toy-house right"></div>
+      <div class="flower a"></div>
+      <div class="flower b"></div>
+      <div class="flower c"></div>
+    </div>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "pinyin-pop-garden-v2";
+    const ROUND_LENGTH = 6;
+
+    const PINYIN_GROUPS = [
+      {
+        id: "finals",
+        title: "Sunny Finals",
+        label: "a o e i u ü",
+        items: [
+          { text: "a", audioText: "啊", displayHint: "Open mouth wide: a", group: "finals" },
+          { text: "o", audioText: "喔", displayHint: "Round lips: o", group: "finals" },
+          { text: "e", audioText: "鹅", displayHint: "Small smile sound: e", group: "finals" },
+          { text: "i", audioText: "衣", displayHint: "Tall little i", group: "finals" },
+          { text: "u", audioText: "乌", displayHint: "Round little u", group: "finals" },
+          { text: "ü", audioText: "迂", displayHint: "u with two bright eyes", group: "finals" }
+        ]
+      },
+      {
+        id: "bpmf",
+        title: "Bouncy Starters",
+        label: "b p m f",
+        items: [
+          { text: "b", audioText: "播", displayHint: "b says bo", group: "bpmf" },
+          { text: "p", audioText: "坡", displayHint: "p says po", group: "bpmf" },
+          { text: "m", audioText: "摸", displayHint: "m says mo", group: "bpmf" },
+          { text: "f", audioText: "佛", displayHint: "f says fo", group: "bpmf" }
+        ]
+      },
+      {
+        id: "dtnl",
+        title: "Tiny Tap Sounds",
+        label: "d t n l",
+        items: [
+          { text: "d", audioText: "得", displayHint: "d says de", group: "dtnl" },
+          { text: "t", audioText: "特", displayHint: "t says te", group: "dtnl" },
+          { text: "n", audioText: "呢", displayHint: "n says ne", group: "dtnl" },
+          { text: "l", audioText: "了", displayHint: "l says le", group: "dtnl" }
+        ]
+      },
+      {
+        id: "gkh",
+        title: "Cloud Sounds",
+        label: "g k h",
+        items: [
+          { text: "g", audioText: "哥", displayHint: "g says ge", group: "gkh" },
+          { text: "k", audioText: "科", displayHint: "k says ke", group: "gkh" },
+          { text: "h", audioText: "喝", displayHint: "h says he", group: "gkh" }
+        ]
+      },
+      {
+        id: "jqx",
+        title: "Sparkle Sounds",
+        label: "j q x",
+        items: [
+          { text: "j", audioText: "鸡", displayHint: "j says ji", group: "jqx" },
+          { text: "q", audioText: "七", displayHint: "q says qi", group: "jqx" },
+          { text: "x", audioText: "西", displayHint: "x says xi", group: "jqx" }
+        ]
+      },
+      {
+        id: "zhchshr",
+        title: "Curly Tongue Garden",
+        label: "zh ch sh r",
+        items: [
+          { text: "zh", audioText: "知", displayHint: "zh says zhi", group: "zhchshr" },
+          { text: "ch", audioText: "吃", displayHint: "ch says chi", group: "zhchshr" },
+          { text: "sh", audioText: "师", displayHint: "sh says shi", group: "zhchshr" },
+          { text: "r", audioText: "日", displayHint: "r says ri", group: "zhchshr" }
+        ]
+      },
+      {
+        id: "zcs",
+        title: "Little Hiss Garden",
+        label: "z c s",
+        items: [
+          { text: "z", audioText: "资", displayHint: "z says zi", group: "zcs" },
+          { text: "c", audioText: "疵", displayHint: "c says ci", group: "zcs" },
+          { text: "s", audioText: "思", displayHint: "s says si", group: "zcs" }
+        ]
+      },
+      {
+        id: "yw",
+        title: "Helper Sounds",
+        label: "y w",
+        items: [
+          { text: "y", audioText: "衣", displayHint: "y helps say yi", group: "yw" },
+          { text: "w", audioText: "乌", displayHint: "w helps say wu", group: "yw" }
+        ]
+      },
+      {
+        id: "aieiuiaoouiu",
+        title: "Slide Finals",
+        label: "ai ei ui · ao ou iu",
+        items: [
+          { text: "ai", audioText: "哀", displayHint: "Slide into ai", group: "aieiuiaoouiu" },
+          { text: "ei", audioText: "欸", displayHint: "Slide into ei", group: "aieiuiaoouiu" },
+          { text: "ui", audioText: "威", displayHint: "ui sounds like wei", group: "aieiuiaoouiu" },
+          { text: "ao", audioText: "凹", displayHint: "Open into ao", group: "aieiuiaoouiu" },
+          { text: "ou", audioText: "欧", displayHint: "Round into ou", group: "aieiuiaoouiu" },
+          { text: "iu", audioText: "优", displayHint: "iu sounds like you", group: "aieiuiaoouiu" }
+        ]
+      },
+      {
+        id: "ieueer",
+        title: "Bright Finals",
+        label: "ie üe er",
+        items: [
+          { text: "ie", audioText: "耶", displayHint: "ie sounds like ye", group: "ieueer" },
+          { text: "üe", audioText: "约", displayHint: "üe sounds like yue", group: "ieueer" },
+          { text: "er", audioText: "儿", displayHint: "Curl softly: er", group: "ieueer" }
+        ]
+      },
+      {
+        id: "aneninunun",
+        title: "Nosey Finals",
+        label: "an en in un ün",
+        items: [
+          { text: "an", audioText: "安", displayHint: "Tap the nose sound: an", group: "aneninunun" },
+          { text: "en", audioText: "恩", displayHint: "Tap the nose sound: en", group: "aneninunun" },
+          { text: "in", audioText: "因", displayHint: "in sounds like yin", group: "aneninunun" },
+          { text: "un", audioText: "温", displayHint: "un sounds like wen", group: "aneninunun" },
+          { text: "ün", audioText: "晕", displayHint: "ün sounds like yun", group: "aneninunun" }
+        ]
+      },
+      {
+        id: "angengingong",
+        title: "Long Nosey Finals",
+        label: "ang eng ing ong",
+        items: [
+          { text: "ang", audioText: "昂", displayHint: "Long nose sound: ang", group: "angengingong" },
+          { text: "eng", audioText: "鞥", displayHint: "Long nose sound: eng", group: "angengingong" },
+          { text: "ing", audioText: "英", displayHint: "ing sounds like ying", group: "angengingong" },
+          { text: "ong", audioText: "翁", displayHint: "Long round sound: ong", group: "angengingong" }
+        ]
+      }
+    ];
+
+    const bubbleColors = ["#ffd45f", "#8fd3ff", "#b9ead7", "#ff8fa3", "#cdbaff", "#ffbd6f"];
+    const rewardFlowers = ["🌼", "⭐", "🌸", "🌈", "☀️", "💎"];
+    const stickerRewards = ["🍓", "🧁", "🎈", "🌈", "🚀", "🎁"];
+    const buddies = ["🌟", "🎀", "🧸", "🍭", "🎵", "💛"];
+    const positiveMessages = [
+      "Yes! A flower grew.",
+      "You found it. Lovely listening.",
+      "Pop! That sound is yours.",
+      "Great ears. Another flower!"
+    ];
+    const buddyMessages = [
+      "Star buddy is dancing.",
+      "Tiny town is cheering.",
+      "Sticker magic is waking up.",
+      "Your ears are sparkling.",
+      "Sound explorer mode!"
+    ];
+
+    const groupSelect = document.querySelector("#groupSelect");
+    const choicesEl = document.querySelector("#choices");
+    const flowersEl = document.querySelector("#flowers");
+    const stepEl = document.querySelector("#step");
+    const groupTitleEl = document.querySelector("#groupTitle");
+    const unlockTextEl = document.querySelector("#unlockText");
+    const taskEl = document.querySelector("#task");
+    const hintEl = document.querySelector("#hint");
+    const toastEl = document.querySelector("#toast");
+    const gardenEl = document.querySelector("#garden");
+    const completionEl = document.querySelector("#completion");
+    const completionTextEl = document.querySelector("#completionText");
+    const confettiEl = document.querySelector("#confetti");
+    const listenButton = document.querySelector("#listen");
+    const replayButton = document.querySelector("#replay");
+    const replayTopButton = document.querySelector("#replayTop");
+    const resetButton = document.querySelector("#reset");
+    const nextGardenButton = document.querySelector("#nextGarden");
+    const musicButton = document.querySelector("#music");
+    const musicToolButton = document.querySelector("#musicTool");
+    const buddyEl = document.querySelector("#buddy");
+    const buddyLineEl = document.querySelector("#buddyLine");
+    const streakLineEl = document.querySelector("#streakLine");
+    const stickerTrackEl = document.querySelector("#stickerTrack");
+    const stickerCountEl = document.querySelector("#stickerCount");
+
+    let state = {
+      groupIndex: 0,
+      unlockedIndex: 0,
+      completedIds: [],
+      step: 1,
+      flowers: 0,
+      roundTargets: [],
+      target: null,
+      locked: false,
+      speechReady: "speechSynthesis" in window,
+      musicOn: false,
+      streak: 0,
+      stickers: []
+    };
+
+    let audioContext = null;
+    let musicTimer = null;
+    let musicStep = 0;
+    const KPOP_STEP_MS = 150;
+    const kpopMelody = [null, 587.33, 659.25, null, 783.99, null, 659.25, 587.33, null, 523.25, 587.33, null, 659.25, 783.99, 880, null];
+    const kpopBass = [98, null, 98, null, 146.83, null, 146.83, null, 164.81, null, 164.81, null, 130.81, null, 130.81, null];
+    const kpopChords = [
+      [392, 493.88, 587.33],
+      [369.99, 440, 554.37],
+      [329.63, 392, 493.88],
+      [261.63, 329.63, 392]
+    ];
+    const childVoiceNames = ["child", "kid", "xiaoyi", "xiaoxiao", "tingting", "mei-jia", "meijia"];
+
+    function loadProgress() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!saved) return;
+        state.unlockedIndex = clampNumber(saved.unlockedIndex, 0, PINYIN_GROUPS.length - 1);
+        state.groupIndex = clampNumber(saved.groupIndex, 0, state.unlockedIndex);
+        state.completedIds = Array.isArray(saved.completedIds) ? saved.completedIds : [];
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        groupIndex: state.groupIndex,
+        unlockedIndex: state.unlockedIndex,
+        completedIds: state.completedIds
+      }));
+    }
+
+    function clampNumber(value, min, max) {
+      const number = Number.isInteger(value) ? value : min;
+      return Math.min(Math.max(number, min), max);
+    }
+
+    function shuffle(items) {
+      return [...items].sort(() => Math.random() - 0.5);
+    }
+
+    function currentGroup() {
+      return PINYIN_GROUPS[state.groupIndex];
+    }
+
+    function buildRoundTargets() {
+      const group = currentGroup();
+      const targets = [];
+      while (targets.length < ROUND_LENGTH) {
+        targets.push(...shuffle(group.items));
+      }
+      state.roundTargets = targets.slice(0, ROUND_LENGTH);
+    }
+
+    function renderGroupSelector() {
+      groupSelect.innerHTML = "";
+      PINYIN_GROUPS.forEach((group, index) => {
+        const option = document.createElement("option");
+        const locked = index > state.unlockedIndex;
+        const completed = state.completedIds.includes(group.id);
+        option.value = String(index);
+        option.disabled = locked;
+        option.textContent = `${completed ? "✓ " : ""}${index + 1}. ${group.label}${locked ? " · locked" : ""}`;
+        groupSelect.appendChild(option);
+      });
+      groupSelect.value = String(state.groupIndex);
+    }
+
+    function renderHeader() {
+      const group = currentGroup();
+      groupTitleEl.textContent = group.title;
+      unlockTextEl.textContent = `Garden ${state.groupIndex + 1}`;
+      flowersEl.textContent = state.flowers;
+      stepEl.textContent = state.step;
+      document.body.dataset.place = String(state.groupIndex % 4);
+      renderStickerBook();
+      renderBuddy();
+    }
+
+    function renderStickerBook() {
+      stickerTrackEl.innerHTML = "";
+      stickerCountEl.textContent = `${state.stickers.length}/${ROUND_LENGTH} today`;
+      for (let index = 0; index < ROUND_LENGTH; index += 1) {
+        const slot = document.createElement("div");
+        slot.className = `sticker-slot${state.stickers[index] ? " filled" : ""}`;
+        slot.textContent = state.stickers[index] || "·";
+        stickerTrackEl.appendChild(slot);
+      }
+    }
+
+    function renderBuddy() {
+      buddyEl.textContent = buddies[state.groupIndex % buddies.length];
+      streakLineEl.textContent = state.streak > 1
+        ? `${state.streak} happy pops in a row`
+        : "Warm up with one happy sound.";
+    }
+
+    function startGroup(groupIndex = state.groupIndex, autoSpeak = true) {
+      state.groupIndex = clampNumber(groupIndex, 0, state.unlockedIndex);
+      state.step = 1;
+      state.flowers = 0;
+      state.streak = 0;
+      state.stickers = [];
+      state.locked = false;
+      gardenEl.innerHTML = "";
+      completionEl.classList.remove("show");
+      buildRoundTargets();
+      renderGroupSelector();
+      renderRound(autoSpeak);
+      saveProgress();
+    }
+
+    function renderRound(autoSpeak = false) {
+      const group = currentGroup();
+      state.locked = false;
+      state.target = state.roundTargets[state.step - 1];
+      const optionCount = state.flowers >= 3 ? 4 : 3;
+      const localDistractors = group.items.filter((item) => item.text !== state.target.text);
+      const backupDistractors = PINYIN_GROUPS
+        .slice(0, state.unlockedIndex + 1)
+        .flatMap((garden) => garden.items)
+        .filter((item) => item.text !== state.target.text && !localDistractors.some((local) => local.text === item.text));
+      const distractors = shuffle([...localDistractors, ...backupDistractors]).slice(0, optionCount - 1);
+      const options = shuffle([state.target, ...distractors]);
+
+      renderHeader();
+      choicesEl.classList.toggle("four", optionCount === 4);
+      choicesEl.innerHTML = "";
+      taskEl.textContent = "Which bubble matches the sound?";
+      hintEl.textContent = state.target.displayHint;
+      toastEl.textContent = state.speechReady ? "Listen, then pop a bubble." : "Tap with parent voice, then pop a bubble.";
+
+      options.forEach((item, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `choice${item.text.length > 1 ? " long" : ""}`;
+        button.textContent = item.text;
+        button.style.setProperty("--bubble", bubbleColors[index % bubbleColors.length]);
+        button.setAttribute("aria-label", `Choose ${item.text}`);
+        button.addEventListener("click", () => checkAnswer(button, item));
+        choicesEl.appendChild(button);
+      });
+
+      if (autoSpeak) {
+        setTimeout(() => speakCurrent(), 260);
+      }
+    }
+
+    function speakCurrent() {
+      if (!state.target) return;
+      if (!state.speechReady) {
+        hintEl.textContent = "Speech is resting. A grown-up can say the sound.";
+        return;
+      }
+
+      const message = new SpeechSynthesisUtterance(state.target.audioText);
+      message.lang = "zh-CN";
+      message.voice = getChildFriendlyMandarinVoice();
+      message.rate = 0.68;
+      message.pitch = 1.32;
+      message.volume = 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(message);
+    }
+
+    function getChildFriendlyMandarinVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      const mandarinVoices = voices.filter((voice) => voice.lang.toLowerCase().startsWith("zh"));
+      return mandarinVoices.find((voice) => {
+        const name = voice.name.toLowerCase();
+        return childVoiceNames.some((keyword) => name.includes(keyword));
+      })
+        || voices.find((voice) => voice.lang === "zh-CN")
+        || voices.find((voice) => voice.lang.toLowerCase().startsWith("zh"))
+        || null;
+    }
+
+    function ensureAudio() {
+      if (!audioContext) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return null;
+        audioContext = new AudioContext();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function playTone(frequency, startTime, duration, type = "sine", gainValue = 0.045) {
+      const context = ensureAudio();
+      if (!context) return;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(gainValue, startTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration + 0.02);
+    }
+
+    function playKick(startTime) {
+      const context = ensureAudio();
+      if (!context) return;
+
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(150, startTime);
+      oscillator.frequency.exponentialRampToValueAtTime(48, startTime + 0.14);
+      gain.gain.setValueAtTime(0.09, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.16);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.18);
+    }
+
+    function playNoise(startTime, duration, gainValue, filterType, frequency) {
+      const context = ensureAudio();
+      if (!context) return;
+
+      const buffer = context.createBuffer(1, context.sampleRate * duration, context.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < data.length; index += 1) {
+        data[index] = Math.random() * 2 - 1;
+      }
+
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const gain = context.createGain();
+      source.buffer = buffer;
+      filter.type = filterType;
+      filter.frequency.setValueAtTime(frequency, startTime);
+      gain.gain.setValueAtTime(gainValue, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(context.destination);
+      source.start(startTime);
+    }
+
+    function playSnare(startTime) {
+      playNoise(startTime, 0.13, 0.036, "bandpass", 1900);
+      playTone(220, startTime, 0.08, "triangle", 0.018);
+    }
+
+    function playHat(startTime, strong = false) {
+      playNoise(startTime, 0.045, strong ? 0.022 : 0.014, "highpass", 6500);
+    }
+
+    function playChord(chord, startTime) {
+      chord.forEach((frequency, index) => {
+        playTone(frequency, startTime + index * 0.012, 0.42, "triangle", 0.014);
+      });
+    }
+
+    function playMusicTick() {
+      if (!state.musicOn) return;
+      const context = ensureAudio();
+      if (!context) return;
+      const now = context.currentTime;
+      const step = musicStep % 16;
+      const chord = kpopChords[Math.floor(step / 4) % kpopChords.length];
+      const melody = kpopMelody[step];
+      const bass = kpopBass[step];
+
+      if ([0, 6, 8, 14].includes(step)) {
+        playKick(now);
+      }
+      if ([4, 12].includes(step)) {
+        playSnare(now);
+      }
+      if (step % 2 === 1) {
+        playHat(now, step === 7 || step === 15);
+      }
+      if (step % 4 === 0) {
+        playChord(chord, now);
+      }
+      if (bass) {
+        playTone(bass, now, 0.13, "sawtooth", 0.026);
+      }
+      if (melody) {
+        playTone(melody, now + 0.02, 0.12, "square", 0.018);
+        playTone(melody * 2, now + 0.025, 0.08, "triangle", 0.008);
+      }
+
+      musicStep += 1;
+    }
+
+    function startMusic() {
+      if (state.musicOn) return;
+      if (!ensureAudio()) {
+        toastEl.textContent = "Music is resting on this browser.";
+        return;
+      }
+      state.musicOn = true;
+      musicButton.classList.add("music-on");
+      musicButton.setAttribute("aria-label", "Turn playful music off");
+      musicToolButton.textContent = "K-pop On";
+      toastEl.textContent = "K-pop play beat is on.";
+      playMusicTick();
+      musicTimer = setInterval(playMusicTick, KPOP_STEP_MS);
+    }
+
+    function stopMusic() {
+      state.musicOn = false;
+      musicButton.classList.remove("music-on");
+      musicButton.setAttribute("aria-label", "Turn playful music on");
+      musicToolButton.textContent = "K-pop Beat";
+      if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+      }
+    }
+
+    function toggleMusic() {
+      if (state.musicOn) {
+        stopMusic();
+        toastEl.textContent = "Music is off. Quiet garden time.";
+      } else {
+        startMusic();
+      }
+    }
+
+    function playHappyChime() {
+      const context = ensureAudio();
+      if (!context) return;
+      const now = context.currentTime;
+      playTone(659.25, now, 0.13, "triangle", 0.055);
+      playTone(783.99, now + 0.09, 0.16, "triangle", 0.05);
+      playTone(1046.5, now + 0.18, 0.2, "sine", 0.04);
+    }
+
+    function checkAnswer(button, item) {
+      if (state.locked) return;
+
+      if (item.text === state.target.text) {
+        state.locked = true;
+        state.flowers += 1;
+        button.classList.add("correct");
+        toastEl.textContent = positiveMessages[(state.flowers - 1) % positiveMessages.length];
+        addReward();
+        addSticker();
+        cheerBuddy();
+        burstConfetti(18);
+        playHappyChime();
+        speakCurrent();
+
+        setTimeout(() => {
+          if (state.step >= ROUND_LENGTH) {
+            completeGroup();
+          } else {
+            state.step += 1;
+            renderRound(true);
+          }
+        }, 900);
+      } else {
+        state.streak = 0;
+        renderBuddy();
+        button.classList.add("wrong");
+        toastEl.textContent = "Good try. Listen again and choose softly.";
+        setTimeout(() => button.classList.remove("wrong"), 420);
+        speakCurrent();
+      }
+    }
+
+    function completeGroup() {
+      const group = currentGroup();
+      if (!state.completedIds.includes(group.id)) {
+        state.completedIds.push(group.id);
+      }
+      if (state.unlockedIndex < PINYIN_GROUPS.length - 1) {
+        state.unlockedIndex += 1;
+      }
+
+      renderHeader();
+      renderGroupSelector();
+      completionTextEl.textContent = state.groupIndex < PINYIN_GROUPS.length - 1
+        ? "A new sound garden is ready when she wants more."
+        : "All basic gardens are open. Beautiful listening!";
+      completionEl.classList.add("show");
+      toastEl.textContent = "Garden complete. Time for a happy stretch.";
+      burstConfetti(36);
+      saveProgress();
+    }
+
+    function nextGarden() {
+      const nextIndex = Math.min(state.groupIndex + 1, state.unlockedIndex);
+      startGroup(nextIndex, true);
+    }
+
+    function addReward() {
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = rewardFlowers[(state.flowers - 1) % rewardFlowers.length];
+      gardenEl.appendChild(badge);
+      flowersEl.textContent = state.flowers;
+    }
+
+    function addSticker() {
+      state.streak += 1;
+      const sticker = stickerRewards[(state.flowers - 1) % stickerRewards.length];
+      state.stickers.push(sticker);
+      renderStickerBook();
+      renderBuddy();
+    }
+
+    function cheerBuddy() {
+      buddyLineEl.textContent = buddyMessages[(state.flowers - 1) % buddyMessages.length];
+      buddyEl.classList.remove("pop");
+      document.querySelector(".mascot").classList.remove("party");
+      requestAnimationFrame(() => {
+        buddyEl.classList.add("pop");
+        document.querySelector(".mascot").classList.add("party");
+      });
+      setTimeout(() => {
+        buddyEl.classList.remove("pop");
+        document.querySelector(".mascot").classList.remove("party");
+      }, 560);
+    }
+
+    function burstConfetti(count) {
+      const confettiColors = ["#ffd45f", "#ff8fa3", "#8fd3ff", "#3f9a75", "#cdbaff"];
+      for (let i = 0; i < count; i += 1) {
+        const piece = document.createElement("i");
+        piece.style.setProperty("--x", `${Math.random() * 100}%`);
+        piece.style.setProperty("--c", confettiColors[i % confettiColors.length]);
+        piece.style.animationDelay = `${Math.random() * 150}ms`;
+        confettiEl.appendChild(piece);
+        setTimeout(() => piece.remove(), 1300);
+      }
+    }
+
+    function resetAllProgress() {
+      localStorage.removeItem(STORAGE_KEY);
+      state.groupIndex = 0;
+      state.unlockedIndex = 0;
+      state.completedIds = [];
+      startGroup(0, true);
+    }
+
+    listenButton.addEventListener("click", speakCurrent);
+    replayButton.addEventListener("click", speakCurrent);
+    replayTopButton.addEventListener("click", speakCurrent);
+    resetButton.addEventListener("click", resetAllProgress);
+    nextGardenButton.addEventListener("click", nextGarden);
+    musicButton.addEventListener("click", toggleMusic);
+    musicToolButton.addEventListener("click", toggleMusic);
+    groupSelect.addEventListener("change", () => {
+      startGroup(Number(groupSelect.value), true);
+    });
+    if (state.speechReady) {
+      window.speechSynthesis.onvoiceschanged = () => getChildFriendlyMandarinVoice();
+      getChildFriendlyMandarinVoice();
+    }
+
+    loadProgress();
+    startGroup(state.groupIndex, false);
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>
