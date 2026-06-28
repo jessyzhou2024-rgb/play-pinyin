@@ -33,6 +33,6 @@ Upload the files to your GitHub repository root.
 The game page should open at:
 
 ```text
-https://jessyzhou2024-rgb.github.io/pinyin-play-town/
+https://jessyzhou2024-rgb.github.io/play-pinyin/
 ```
 
